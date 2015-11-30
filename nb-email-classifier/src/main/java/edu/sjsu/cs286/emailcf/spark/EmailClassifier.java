@@ -10,8 +10,6 @@ import edu.sjsu.cs286.wordcount.SparkWordCount;
 public class EmailClassifier {
 
 	public static void main(String[] args) throws Exception {
-		String inputFileSpam = args[0];
-		String inputFileHam = args[1];
 		
 		// Create a Java Spark Context.
 		SparkConf conf = new SparkConf().setAppName("EmailClassifier");
@@ -19,24 +17,25 @@ public class EmailClassifier {
 		
 		/* Read Data */
 		// Read data from CSV
-		JavaRDD<String> inputSpam = sc.textFile(inputFileSpam);
-		JavaRDD<String> inputHam = sc.textFile(inputFileHam);
+		JavaRDD<String> distFile = sc.textFile("/user/user01/cs286-spark-nb-email-classification/dataset/subjects.csv");
 
 		/* Split data as testing and training */
 		// 70% is training, 30% is testing data
-		
+		double trainingRatio = 0.7;
 		/* Training */
 		// Create model
 		
 		// Call WordCount
-		JavaPairRDD<String, Integer> spamCounts = SparkWordCount.countWords(inputSpam, sc);
-		JavaPairRDD<String, Integer> hamCounts = SparkWordCount.countWords(inputHam, sc);
 		
 		
 		/* Testing */
 		// Test the classifier
 		
 		/* Confusion Matrix*/
+
+        	System.out.println("Precision: ");
+        	System.out.println("Recall: ");
+        	System.out.println("Accuracy: ");
 		
 	}
 }

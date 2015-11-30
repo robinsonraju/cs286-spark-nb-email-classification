@@ -17,7 +17,7 @@
               <manifest>
                 <addClasspath>true</addClasspath>
                 <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>edu.sjsu.cs286.emailcf.EmailClassifier</mainClass>
+                <mainClass>edu.sjsu.cs286.emailcf.spark.EmailClassifier</mainClass>
               </manifest>
             </archive>
           </configuration>
