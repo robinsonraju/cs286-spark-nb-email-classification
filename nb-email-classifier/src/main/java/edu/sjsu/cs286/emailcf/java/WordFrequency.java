@@ -47,7 +47,6 @@ public class WordFrequency {
 		
 		setpSpam(cntWordsSpam, cntWordsAll);
 		setpHam(cntWordsHam, cntWordsAll);
-		System.out.println(toString());
 	}
 
 	public int getCntSpam() {

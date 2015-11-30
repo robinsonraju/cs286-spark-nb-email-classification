@@ -10,7 +10,6 @@ import java.util.Map;
 
 /**
  * 
- * @author rraju
  * Simple classifier that uses Naive Bayes to classify spam or ham
  *
  */
@@ -24,7 +23,8 @@ public class JavaTextClassifier {
 	private static Map<String, WordFrequency> wordDictionary = new HashMap<String, WordFrequency>();
 	private static int cntWordsSpam = 0;// Total unique words in spam dataset
 	private static int cntWordsHam = 0; // Total unique words in ham dataset
-	
+	private static float pSpam = 0.0f; // Probability of Spam
+	private static float pHam = 0.0f; // Probability of Ham
 	
 	/**
 	 * 
@@ -54,17 +54,27 @@ public class JavaTextClassifier {
 		// Train
 		List<String> trainingData = getSublist(inputData, percTraining, true); 
 		train(trainingData);
-
-		System.out.println(wordDictionary.size());
-		System.out.println(cntWordsSpam);
-		System.out.println(cntWordsHam);
 		
 		// Classify
 		List<String> testingData = getSublist(inputData, percTraining, false); 
+		boolean[] testingDataResult = new boolean[testingData.size()];
+		boolean[] classifierResult = new boolean[testingData.size()];
 		
-
+		int cntAccuracy = 0;
+		for (int i = 0; i < testingData.size(); i++) {
+			String[] parts = testingData.get(i).split(",");
+			testingDataResult[i] = SPAM.equals(parts[0]);
+			classifierResult[i] = isSpam(parts[1]);
+			
+			if (testingDataResult[i] == classifierResult[i]) {
+				cntAccuracy++;
+			}
+		}
+		
+		System.out.println("Testing data size : " + testingData.size());
+		System.out.println("Number of accurate classifications : " + cntAccuracy);
+		System.out.println("Classifier Accuracy : " + (cntAccuracy * 100 /testingData.size()) );
 	}
-	
 	
 	/**
 	 * 
@@ -73,18 +83,25 @@ public class JavaTextClassifier {
 	private static void train(List<String> trainingData ) {
 		Map<String, WordFrequency> spamWords = new HashMap<String, WordFrequency>();
 		Map<String, WordFrequency> hamWords = new HashMap<String, WordFrequency>();
+		int cntSpamRecords = 0;
+		int cntHamRecords = 0;
 		
 		// WordCount
 		for (String line : trainingData) {
 			String[] parts = line.split(",");
 			if(SPAM.equals(parts[0])) {
 				updateWordCount(spamWords, parts[1], true);
+				cntSpamRecords++;
 			} else if(HAM.equals(parts[0])) {
 				updateWordCount(hamWords, parts[1], false);
+				cntHamRecords++;
 			} else {
 				// Ignore - bad data
 			}
 		}
+		
+		pSpam = (float)cntSpamRecords / (float)(cntSpamRecords + cntHamRecords);
+		pHam = (float)cntHamRecords / (float)(cntSpamRecords + cntHamRecords);	
 		
 		cntWordsSpam = spamWords.size();
 		cntWordsHam = hamWords.size();
@@ -132,6 +149,32 @@ public class JavaTextClassifier {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private static boolean isSpam(String text) {
+		String[] tokens = text.split(" ");
+		
+		float spamProbability = 1.0f;
+		float hamProbability = 1.0f;
+		
+		for (String token : tokens) {
+			token = normalize(token);
+			if (wordDictionary.containsKey(token)) {
+				spamProbability *= wordDictionary.get(token).getpSpam();
+				hamProbability *= wordDictionary.get(token).getpHam();				
+			}
+		}
+
+		spamProbability = spamProbability * pSpam;
+		hamProbability = hamProbability * pHam;
+
+		return spamProbability > hamProbability;
+	}
+	
 	
 	/**
 	 * Normalize the String. 
