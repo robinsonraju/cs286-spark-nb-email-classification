@@ -1,4 +1,4 @@
-package edu.sjsu.cs286.emailcf;
+package edu.sjsu.cs286.emailcf.spark;
 
 /**
  * This class holds the probabilities for a word. 

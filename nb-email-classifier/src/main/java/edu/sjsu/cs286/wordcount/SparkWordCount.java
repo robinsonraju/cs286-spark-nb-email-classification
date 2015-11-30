@@ -25,6 +25,8 @@ public class SparkWordCount {
 		// map/split each line to multiple words
 		JavaRDD<String> words = input
 				.flatMap(new FlatMapFunction<String, String>() {
+					private static final long serialVersionUID = 6059313731696247954L;
+
 					public Iterable<String> call(String x) {
 						return Arrays.asList(x.split(" "));
 					}
@@ -33,14 +35,18 @@ public class SparkWordCount {
 		// Turn the words into (word, 1) pairs
 		JavaPairRDD<String, Integer> wordOnePairs = words
 				.mapToPair(new PairFunction<String, String, Integer>() {
+					private static final long serialVersionUID = 7304082119186244203L;
+
 					public Tuple2<String, Integer> call(String x) {
-						return new Tuple2(x, 1);
+						return new Tuple2<String, Integer>(x, 1);
 					}
 				});
 		
 		// reduce add the pairs by key to produce counts
 		JavaPairRDD<String, Integer> counts = wordOnePairs
 				.reduceByKey(new Function2<Integer, Integer, Integer>() {
+					private static final long serialVersionUID = 4018260032332290548L;
+
 					public Integer call(Integer x, Integer y) {
 						return x + y;
 					}

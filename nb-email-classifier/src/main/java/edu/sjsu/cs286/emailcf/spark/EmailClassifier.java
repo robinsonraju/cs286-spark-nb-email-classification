@@ -1,4 +1,4 @@
-package edu.sjsu.cs286.emailcf;
+package edu.sjsu.cs286.emailcf.spark;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
