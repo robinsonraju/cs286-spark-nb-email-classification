@@ -3,6 +3,7 @@ package edu.sjsu.cs286.emailcf.java;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  * Simple classifier that uses Naive Bayes to classify spam or ham
  *
  */
-public class JavaTextClassifier {
+public class JavaEmailClassifier {
 
 	private static final String SPAM = "spam";
 	private static final String HAM = "ham";
@@ -50,6 +51,7 @@ public class JavaTextClassifier {
 				inputData.add(line);
 			}
 		}
+		Collections.shuffle(inputData);
 		
 		// Train
 		List<String> trainingData = getSublist(inputData, percTraining, true); 
@@ -71,6 +73,7 @@ public class JavaTextClassifier {
 			}
 		}
 		
+		System.out.println("Training data size : " + trainingData.size());
 		System.out.println("Testing data size : " + testingData.size());
 		System.out.println("Number of accurate classifications : " + cntAccuracy);
 		System.out.println("Classifier Accuracy : " + (cntAccuracy * 100 /testingData.size()) );

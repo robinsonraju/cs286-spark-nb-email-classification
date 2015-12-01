@@ -22,7 +22,15 @@ public class WordFrequency {
 	// (1 + cntHam) / [cntTotalHam + (cntTotalSpam + cntTotalHam)]
 	private float pHam;
 	
-	// 
+	// Default Constructor
+	public WordFrequency() {
+		cntSpam = 0;
+		cntHam = 0;
+		pSpam = 0.0f;
+		pHam = 0.0f;
+	}
+	
+	// Takes word and boolean to increment ham or spam count
 	public WordFrequency(String word, boolean spam) {
 		this.word = word;
 		cntSpam = 0;
