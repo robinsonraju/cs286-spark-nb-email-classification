@@ -89,7 +89,8 @@ public class SparkEmailClassifier {
 		
 		
 		/* Classification */
-		List<String> testingData = test.collect(); 
+		JavaRDD<String> cleanedTestData = test.filter(new EmptyDataRemoveFunction());
+		List<String> testingData = cleanedTestData.collect(); 
 		boolean[] testingDataResult = new boolean[testingData.size()];
 		boolean[] classifierResult = new boolean[testingData.size()];
 		
@@ -203,6 +204,23 @@ class HamLabelRemoveFunction implements Function<String, String> {
 	@Override
 	public String call(String s) {
 		return s.replaceAll("ham,", "");
+	}
+}
+
+/**
+ * Filters empty data
+ */
+@SuppressWarnings("serial")
+class EmptyDataRemoveFunction implements Function<String, Boolean> {
+	@Override
+	public Boolean call(String s) {
+		boolean goodRec = true;
+		
+		if (s == null || s.trim() == "")  goodRec = false;
+		String[] parts = s.split(",");
+		if (parts.length != 2) goodRec = false;
+		
+		return goodRec;
 	}
 }
 
