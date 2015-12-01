@@ -94,8 +94,7 @@ public class SparkEmailClassifier {
 		boolean[] testingDataResult = new boolean[testingData.size()];
 		boolean[] classifierResult = new boolean[testingData.size()];
 		
-		int cntAccuracy = 0;
-		for (int i = 0; i < testingData.size(); i++) {
+		/*for (int i = 0; i < testingData.size(); i++) {
 			if (testingData.get(i) == null || testingData.get(i).trim() == "")  continue;
 			
 			String[] parts = testingData.get(i).split(",");
@@ -107,12 +106,54 @@ public class SparkEmailClassifier {
 			if (testingDataResult[i] == classifierResult[i]) {
 				cntAccuracy++;
 			}
+		}*/
+		
+		int truePos = 0;
+		int falsePos = 0;
+		int falseNeg = 0;
+		int trueNeg = 0;
+		
+		for (int i = 0; i < testingData.size(); i++) {
+			String[] parts = testingData.get(i).split(",");
+			
+			testingDataResult[i] = "spam".equals(parts[0]);
+			classifierResult[i] = isSpam(model, pSpam, pHam, parts[1]);
+			
+			if (testingDataResult[i]) { // Actual data - Spam
+				if (classifierResult[i]) { 
+					truePos++; // Spam Spam
+				} else {
+					falsePos++; // Spam Ham
+				}
+			} else {
+				if (classifierResult[i]) { 
+					falseNeg++; // Ham Spam
+				} else {
+					trueNeg++; // Ham Ham
+				}
+			}
 		}
 		
 		System.out.println("Training data size : " + training.count());
 		System.out.println("Testing data size : " + testingData.size());
-		System.out.println("Number of accurate classifications : " + cntAccuracy);
-		System.out.println("Classifier Accuracy : " + (cntAccuracy * 100 /testingData.size()) );
+
+		System.out.println("True Positive : " + truePos);
+		System.out.println("False Positive : " + falsePos);
+		System.out.println("False Negative : " + falseNeg);
+		System.out.println("True Negative : " + trueNeg);
+		
+		// Accuracy = TP + TN / Total
+		float accuracy = (float)(truePos + trueNeg) / (float) (truePos + falsePos + falseNeg + trueNeg); 
+		
+		// Precision = TP / (TP + FP)
+		float precision = (float)truePos / (float)(truePos + falsePos);
+				
+		// Recall = TP / (TP + FN)
+		float recall = (float)truePos / (float)(truePos + falseNeg);
+		
+		System.out.println("Accuracy : " + accuracy);
+		System.out.println("Precision : " + precision);
+		System.out.println("Recall : " + recall);
 		
 		sc.close();
 	}
