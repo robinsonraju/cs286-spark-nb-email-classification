@@ -1,10 +1,14 @@
 package edu.sjsu.cs286.emailcf.java;
 
+import java.io.Serializable;
+
 /**
  * This class holds the probabilities for a word. 
  * 
 **/
-public class WordFrequency {
+@SuppressWarnings("serial")
+public class WordFrequency implements Serializable {
+	
 	// The word
 	private String word;
 	

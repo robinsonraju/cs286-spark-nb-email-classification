@@ -41,9 +41,11 @@ public class SparkEmailClassifier {
 		test.cache();
 		
 		// Filter Spam and Ham records from the input
-		JavaRDD<String> inputSpam = training.filter(new SpamFilterFunction());
-		JavaRDD<String> inputHam = training.filter(new HamFilterFunction());
-
+		JavaRDD<String> spamRecs = training.filter(new SpamFilterFunction());
+		JavaRDD<String> hamRecs = training.filter(new HamFilterFunction());
+		JavaRDD<String> inputSpam = spamRecs.map(new SpamLabelRemoveFunction());
+		JavaRDD<String> inputHam = hamRecs.map(new HamLabelRemoveFunction());
+		
 		// Calculate overall probability of Spam and Ham
 		long cntSpamRecords = inputSpam.count();
 		long cntHamRecords = inputHam.count();
@@ -67,14 +69,14 @@ public class SparkEmailClassifier {
 			@Override
 			public WordFrequency call(
 					Tuple2<Optional<WordFrequency>, Optional<WordFrequency>> v1) {
-				WordFrequency objWithSpamCount = v1._1.get();
-				WordFrequency objWithHamCount = v1._2.get();
+
 				WordFrequency word = new WordFrequency();
-				if (objWithSpamCount != null) {
-					word.setCntSpam(objWithSpamCount.getCntSpam());
+				if (v1._1.isPresent()) {
+					word.setCntSpam(v1._1.get().getCntSpam());
 				}
-				if (objWithHamCount != null) {
-					word.setCntHam(objWithHamCount.getCntHam());
+				
+				if (v1._2.isPresent()) {
+					word.setCntHam(v1._2.get().getCntHam());
 				}
 				word.updateProbabilities(cntWordsSpam.value(), cntWordsHam.value());
 				return word;
@@ -93,7 +95,11 @@ public class SparkEmailClassifier {
 		
 		int cntAccuracy = 0;
 		for (int i = 0; i < testingData.size(); i++) {
+			if (testingData.get(i) == null || testingData.get(i).trim() == "")  continue;
+			
 			String[] parts = testingData.get(i).split(",");
+			if (parts.length != 2) continue;
+			
 			testingDataResult[i] = "spam".equals(parts[0]);
 			classifierResult[i] = isSpam(model, pSpam, pHam, parts[1]);
 			
@@ -116,6 +122,7 @@ public class SparkEmailClassifier {
 	 * @return
 	 */
 	private static boolean isSpam(Map<String, WordFrequency> model, float pSpam, float pHam, String text) {
+
 		String[] tokens = text.split(" ");
 		
 		float spamProbability = 1.0f;
@@ -141,7 +148,7 @@ public class SparkEmailClassifier {
  */
 @SuppressWarnings("serial")
 class CleanUpDataFunction implements Function<String, String> {
-	private static final String[] specialCharacters = { ",", "#", ";", "\"", "\'", "!", "." };
+	private static final String[] specialCharacters = { "#", ";", "\"", "\'", "!", "." };
 	private static final String empty = "";
 	
 	@Override
@@ -176,3 +183,26 @@ class HamFilterFunction implements Function<String, Boolean> {
 		return s.startsWith("ham");
 	}
 }
+
+/**
+ * Removes the label
+ */
+@SuppressWarnings("serial")
+class SpamLabelRemoveFunction implements Function<String, String> {
+	@Override
+	public String call(String s) {
+		return s.replaceAll("spam,", "");
+	}
+}
+
+/**
+ * Removes the label
+ */
+@SuppressWarnings("serial")
+class HamLabelRemoveFunction implements Function<String, String> {
+	@Override
+	public String call(String s) {
+		return s.replaceAll("ham,", "");
+	}
+}
+
