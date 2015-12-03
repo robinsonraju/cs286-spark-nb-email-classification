@@ -41,7 +41,7 @@ public class JavaEmailClassifier {
 		 */
 		
 		String inputFile = "src/main/resources/subjects.csv";
-		String percTraining = "80";
+		String percTraining = "70";
 		
 		// Read data into memory
 		List<String> inputData = new ArrayList<>();
@@ -136,6 +136,8 @@ public class JavaEmailClassifier {
 				// Ignore - bad data
 			}
 		}
+		System.out.println("Count Spam : " + cntSpamRecords);
+		System.out.println("Count Ham : " + cntHamRecords);
 		
 		pSpam = (float)cntSpamRecords / (float)(cntSpamRecords + cntHamRecords);
 		pHam = (float)cntHamRecords / (float)(cntSpamRecords + cntHamRecords);	
@@ -201,6 +203,7 @@ public class JavaEmailClassifier {
 		for (String token : tokens) {
 			token = normalize(token);
 			if (wordDictionary.containsKey(token)) {
+				System.out.println(wordDictionary.get(token).toString());
 				spamProbability *= wordDictionary.get(token).getpSpam();
 				hamProbability *= wordDictionary.get(token).getpHam();				
 			}

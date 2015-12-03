@@ -33,8 +33,8 @@ public class SparkEmailClassifier {
 		JavaRDD<String> cleanedInputData = inputData.map(new CleanUpDataFunction());
 		
 		/* Split data as testing and training */
-		// 80% is training, 20% is testing data
-		JavaRDD<String>[] tmp = cleanedInputData.randomSplit(new double[] { 0.8, 0.2 });
+		// 70% is training, 30% is testing data
+		JavaRDD<String>[] tmp = cleanedInputData.randomSplit(new double[] { 0.7, 0.3 });
 		JavaRDD<String> training = tmp[0]; // training set
 		JavaRDD<String> test = tmp[1]; // test set
 		training.cache();
@@ -65,7 +65,8 @@ public class SparkEmailClassifier {
 		
 		// Calculate Spam and Ham probabilities for each word
 		@SuppressWarnings("serial")
-		JavaPairRDD<String, WordFrequency> dictionary = mergedRDD.mapValues(new Function<Tuple2<Optional<WordFrequency>,Optional<WordFrequency>>, WordFrequency>() {
+		JavaPairRDD<String, WordFrequency> dictionary = mergedRDD.mapValues(
+				new Function<Tuple2<Optional<WordFrequency>,Optional<WordFrequency>>, WordFrequency>() {
 			@Override
 			public WordFrequency call(
 					Tuple2<Optional<WordFrequency>, Optional<WordFrequency>> v1) {
@@ -93,20 +94,6 @@ public class SparkEmailClassifier {
 		List<String> testingData = cleanedTestData.collect(); 
 		boolean[] testingDataResult = new boolean[testingData.size()];
 		boolean[] classifierResult = new boolean[testingData.size()];
-		
-		/*for (int i = 0; i < testingData.size(); i++) {
-			if (testingData.get(i) == null || testingData.get(i).trim() == "")  continue;
-			
-			String[] parts = testingData.get(i).split(",");
-			if (parts.length != 2) continue;
-			
-			testingDataResult[i] = "spam".equals(parts[0]);
-			classifierResult[i] = isSpam(model, pSpam, pHam, parts[1]);
-			
-			if (testingDataResult[i] == classifierResult[i]) {
-				cntAccuracy++;
-			}
-		}*/
 		
 		int truePos = 0;
 		int falsePos = 0;
@@ -171,7 +158,6 @@ public class SparkEmailClassifier {
 		float hamProbability = 1.0f;
 		
 		for (String token : tokens) {
-			//token = normalize(token);
 			if (model.containsKey(token)) {
 				spamProbability *= model.get(token).getpSpam();
 				hamProbability *= model.get(token).getpHam();				
