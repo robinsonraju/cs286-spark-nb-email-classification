@@ -1,6 +1,7 @@
 package edu.sjsu.cs286.emailcf.spark;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.spark.SparkConf;
@@ -39,8 +40,8 @@ public class EmailClassifier {
 		JavaRDD<String> lines = rdd.flatMap(
             new FlatMapFunction<Tuple2<String, List<String>>, String>() {
 
-					public Iterable<String> call(Tuple2<String, List<String>> t) {
-						return t._2;
+					public Iterator<String> call(Tuple2<String, List<String>> t) {
+						return t._2.iterator();
 					}
             });
 
