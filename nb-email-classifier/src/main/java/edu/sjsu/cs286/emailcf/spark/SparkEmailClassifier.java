@@ -12,7 +12,7 @@ import org.apache.spark.broadcast.Broadcast;
 
 import scala.Tuple2;
 
-import com.google.common.base.Optional;
+import org.apache.spark.api.java.Optional;
 
 import edu.sjsu.cs286.emailcf.java.WordFrequency;
 

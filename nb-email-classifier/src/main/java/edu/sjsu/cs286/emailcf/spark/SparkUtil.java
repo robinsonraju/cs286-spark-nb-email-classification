@@ -1,6 +1,7 @@
 package edu.sjsu.cs286.emailcf.spark;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -56,8 +57,8 @@ public class SparkUtil {
 class SplitWordsFunction implements FlatMapFunction<String, String> {
 	
 	@Override
-	public Iterable<String> call(String x) {
-		return Arrays.asList(x.split(" "));
+	public Iterator<String> call(String x) {
+		return Arrays.asList(x.split(" ")).iterator();
 	}
 }
 
