@@ -4,7 +4,7 @@ Email Classification as Spam/Ham using Naive Bayes Classifier on Apache Spark.
 
 ## Build and run
 
-Use a JDK supported by Spark 3.5.7 (Java 8, 11, or 17) and Maven. Spark Core is a provided dependency: install Spark 3.5.7 built for Scala 2.12 on the machine or cluster that runs the classifier. The legacy Spark 1.4.1 runtime is incompatible with this build.
+Use a JDK supported by Spark 3.5.8 (Java 8, 11, or 17) and Maven. Spark Core is a provided dependency: install Spark 3.5.8 built for Scala 2.12 on the machine or cluster that runs the classifier. The legacy Spark 1.4.1 runtime is incompatible with this build. Upgrade any deployed Spark History Server to 3.5.8 or later to address [CVE-2026-32773](https://github.com/advisories/GHSA-9437-39hj-3c93); updating this provided dependency does not upgrade the deployed runtime.
 
 ```sh
 cd nb-email-classifier
